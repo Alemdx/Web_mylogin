@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta http-equiv="Access-Control-Allow-Origin" content="*">
+        <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+        <link rel="stylesheet" href="css/login.css"> 
+		<link rel="stylesheet" href="css/signup.css">
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body class="global">
+	<div class="context">
+			<div class="container">
+				<h1>Welcome</h1>
+				<form action="" method="get">
+					<input id="id" type="text"placeholder="请输入邮箱" required/>
+					<input type="password" name=""  placeholder="请输入密码" oninput="passValidate(this)" id="inputPwd" value="" required>
+                    <input id="enpassword" type="password" placeholder="请再次输入密码" required/>
+					<p>请至少使用字母、数字、符号两种类型组合的密码，长度为6~20位。</p>
+					<ul class="pwdStrength">
+						<li class="weak"></li>
+						<li class="middle"></li>
+						<li class="strong"></li>
+						<li class="result"></li>
+					</ul>
+					<button id="btn_submit"type="submit">注册</button>					
+				</form>	
+			</div>			
+		</div>	
+	</body> 	
+</html>
+<script>
+//密码强度验证
+//console.log($('#inputPwd'))
+function passValidate(e) {
+	var pwd = $.trim(e.value);
+	if (pwd === '') {
+		$('.pwdStrength').css({'display':'none'})
+		$('.weak').css({
+			'background': 'rgb(238, 238, 238)'
+		});
+		$('.middle').css({
+			'background': 'rgb(238, 238, 238)'
+		});
+		$('.strong').css({
+			'background': 'rgb(238, 238, 238)'
+		});
+		$('.result').text('')
+	} else {
+		$('.pwdStrength').css({'display':'flex'})
+		//密码为八位及以上并且字母数字特殊字符三项都包括
+		var strongRegex = new RegExp("^(?=.{8,})(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*\\W).*$", "g");
+		//密码为七位及以上并且字母、数字、特殊字符三项中有两项，强度是中等
+		var mediumRegex = new RegExp("^(?=.{7,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))).*$", "g");
+		var enoughRegex = new RegExp("(?=.{6,}).*", "g");
+		if (false == enoughRegex.test(pwd)) {
+		} else if (strongRegex.test(pwd)) {
+			$('.strong').css({
+				'background': '#33ff33'
+			});
+			$('.result').text('强')
+		} else if (mediumRegex.test(pwd)) {
+
+			$('.middle').css({
+				'background': '#FFC125'
+			});
+			$('.strong').css({
+				'background': 'rgb(238, 238, 238)'
+			});
+			$('.result').text('中')
+		} else {
+
+			$('.weak').css({
+				'background': '#EE4000'
+			});
+			$('.middle').css({
+				'background': 'rgb(238, 238, 238)'
+			});
+			$('.strong').css({
+				'background': 'rgb(238, 238, 238)'
+			});
+			$('.result').text('弱')
+		}
+	}
+}
+
+
+//注册验证
+$('#btn_submit').click(function(){
+	//console.log("das")
+    let dataObj = {
+        'id': document.getElementById("id").value,
+        'password': document.getElementById("inputPwd").value,
+        'enpassword': document.getElementById("enpassword").value
+    };//如果密码正确的话，就进行hash操作，将id，hash，salt传递到服务端
+	if(dataObj.password==dataObj.enpassword){
+		let hash=get_sha256(s,dataObj.password);//进行sha256hash，参数为密码和盐
+		let info={'id':dataObj.id,'hash':hash,'salt':s};
+		console.log(dataObj);
+		sendinfo(info);
+		// alert("success");
+		// window.location.replace("https://www.runoob.com");
+	}else{
+		alert("两次密码输入不一致");
+	}
+
+});
+
+//将id、hash、salt提交到后端
+function sendinfo(dataobj){
+	$.ajax({
+  type: 'POST',
+  url: 'http://localhost:3000/users/usrinfo',
+  data: dataobj,
+  dataType: 'text',
+  success:function(data) {//发送请求成功执行的函数
+		alert("success!"),
+        window.location.replace("https://www.runoob.com");
+    },
+  error:function(err){
+                alert("fail!");
+            }
+});}
+
+//创建一个function用来生成盐
+function randomstr(length){
+    return CryptoJS.lib.WordArray.random(16).words[0].toString()
+}
+var s=randomstr();
+
+//采用sha256加密
+function get_sha256(str, secret) {
+var signature = CryptoJS.HmacSHA256(str, secret);
+signature = CryptoJS.enc.Base64.stringify(signature);
+console.log(signature);
+	return signature;
+}
+
+</script>
