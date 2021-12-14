@@ -38,7 +38,7 @@ npm start //启动服务端
 
   ![image-20211214105727170](C:\Users\12451\AppData\Roaming\Typora\typora-user-images\image-20211214105727170.png)
 
-+ 服务端展示
++ 数据库展示
 
 ![image-20211214105526990](C:\Users\12451\AppData\Roaming\Typora\typora-user-images\image-20211214105526990.png)
 
